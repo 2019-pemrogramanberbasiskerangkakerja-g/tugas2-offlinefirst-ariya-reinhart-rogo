@@ -1,0 +1,19 @@
+{
+  "name": "node-js-offline-first",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "serve": "nodemon index.js"
+  },
+  "author": "Ariya Wildan, Reinhart Ceisar, Rogo Jagad Alit",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "ejs": "^2.6.1",
+    "express": "^4.16.4",
+    "nodemon": "^1.18.10",
+    "realm": "^2.23.0",
+    "superagent": "^4.1.0"
+  }
+}

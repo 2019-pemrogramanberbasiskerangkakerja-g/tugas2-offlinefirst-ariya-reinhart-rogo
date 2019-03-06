@@ -78,9 +78,13 @@ app.post('/register', (req, res) => {
         })
     })
 
+    res.sendFile(__dirname + "/register-complete.html")
+})
+
+setInterval(() => {
     let user = blogRealm.objects('User')
 
-    console.log(user)
+    console.log("Syncing to local DB")
 
     agent.post('localhost:3000/sync')
         .send(user)
@@ -96,9 +100,7 @@ app.post('/register', (req, res) => {
                 console.log(err)
             }
         )
-
-    res.sendFile(__dirname + "/register-complete.html")
-})
+}, 3000)
 
 app.listen(3003, () => {
     console.log("Start")

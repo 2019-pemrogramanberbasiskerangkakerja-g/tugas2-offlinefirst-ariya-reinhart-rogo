@@ -5,7 +5,8 @@ const express = require('express')
 const realm = require('realm')
 const agent = require('superagent')
 const app = express()
-const { sync } = require('./sync')
+
+app.use(bodyParser.json())
 
 let PostSchema = {
     name: 'User',
@@ -27,110 +28,61 @@ app.use(bodyParser.urlencoded({
 app.set('view engine', 'ejs')
 
 app.get('/', (req, res) => {
-    agent.get("localhost:3003")
-        .then(
-            response => {
-                console.log("Querying from remote DB")
-                let user = JSON.parse(response.text) 
-                let length = Object.keys(user).length
-                res.render('index.ejs', {user: user, length: length})
-            }
-        )
-        .catch(
-            () => {
-                console.log("Remote not available, querying from local DB")
-                let user = blogRealm.objects('User')
-                res.render('index.ejs', {user: user, length: user.length})
-            }
-        )
+    let user = blogRealm.objects('User')
+    res.render('index.ejs', { user: user, length: user.length })
 })
 
 app.get('/login', (req, res) => {
     res.sendFile(__dirname + "/login.html")
 })
 
-app.get('/register', (req, res) => {
-    res.sendFile(__dirname + "/register.html")
-})
-
 app.get('/delete', (req, res) => {
-    blogRealm.write( () => {
+    blogRealm.write(() => {
         let users = blogRealm.objects('User')
         blogRealm.deleteAll()
     })
 
-    agent.get("localhost:3003/delete")
-        .then(
-            response => {
-                console.log("Remote synced : delete")
-            }
-        )
-
     res.send("Deleted")
 })
 
-app.post('/register', (req, res) => {
-    let username = req.body['username']
-    let password = req.body['password']
-
-    blogRealm.write( () => {
-        blogRealm.create('User', {
-            username: username, 
-            password: password, 
-        })
+app.post('/sync', (req, res) => {
+    blogRealm.write(() => {
+        let users = blogRealm.objects('User')
+        blogRealm.deleteAll()
     })
 
-    let user = blogRealm.objects('User')
+    let users = req.body
 
-    sync(user)
+    console.log(users)
 
-    res.sendFile(__dirname + "/register-complete.html")
+    blogRealm.write(() => {
+        for (let i in users) {
+            console.log(users[i].username)
+            blogRealm.create('User', {
+                username: users[i].username,
+                password: users[i].password,
+            })
+        }
+    })
+
+    res.status(201)
+    res.send("Succes Updated")
 })
 
 app.post('/login', (req, res) => {
-    let user = blogRealm.objects('User')
-
-    sync(user)
-
     let username = req.body['username']
     let password = req.body['password']
 
-    agent.get("localhost:3003/login")
-    .ok(res => res.status < 500)
-    .send({
-        username: username,
-        password: password
-    })
-    .then(
-        response => {
-            console.log("Querying from remote DB")
-            
-            if(response.status == 200)
-            {
-                res.render('login-success.ejs', {username: username})
-            }
-            else if( response.status == 404 )
-            {
-                res.end("Data not found")
-            }
-        }
+    let user = blogRealm.objects('User').filtered(
+        'username = "' + username + '"' + ' AND ' + 'password = "' + password + '"'
     )
-    .catch(
-        err => {
-            console.log(err)
-            
-            let user = blogRealm.objects('User').filtered(
-                'username = "' + username + '"' + ' AND ' + 'password = "' + password + '"'
-            )
-            
-            if (user.length == 0){
-                res.send("Data not found")
-            }
-            else{
-                res.render('login-success.ejs', {username: username})
-            }
-        }
-    )
+
+    if (user.length == 0) {
+        res.send("Data not found")
+    }
+    else {
+        res.render('login-success.ejs', { username: username })
+    }
 })
 
 app.listen(3000, () => {

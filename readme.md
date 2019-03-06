@@ -16,3 +16,10 @@ Masing - masing project sudah dilengkapi dengan `nodemon` sehingga tidak perlu m
 ## How to Run
 1. Jalankan `npm install` di folder `local` dan `remote` (untuk melakukan instalasi package Node.js yang diperlukan)
 2. Jalankan `npm run serve` di folder `local` dan `remote`
+
+## To Do list
+1. Register di remote (done)
+2. Push data user ke DB Local (done)
+3. Buat DB log di local dan remote
+4. Rekam log di DB local 
+5. Push data log dari local ke remote

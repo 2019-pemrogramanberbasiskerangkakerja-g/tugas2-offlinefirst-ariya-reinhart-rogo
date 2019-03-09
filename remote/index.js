@@ -51,9 +51,11 @@ app.get('/delete', (req, res) => {
 
 app.get('/', (req, res) => {
     let users = blogRealm.objects('User')
+    let log = recordRealm.objects('Log')
 
     res.status(200)
     res.send(users)
+    res.send(log)
 })
 
 app.post('/sync', (req, res) => {

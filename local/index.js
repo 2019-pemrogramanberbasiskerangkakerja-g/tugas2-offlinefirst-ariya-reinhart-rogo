@@ -80,26 +80,6 @@ app.post('/sync', (req, res) => {
         }
     })
 
-    recordRealm.write(() => {
-        let log = recordRealm.objects('Log')
-        recordRealm.deleteAll()
-    })
-
-    let log = req.body
-
-    console.log(log)
-
-    recordRealm.write(() => {
-        for (let i in log) {
-            console.log(log[i].username)
-            recordRealm.create('Log', {
-                username: log[i].username,
-                login: log[i].login,
-                time: log[i].time
-            })
-        }
-    })
-
     res.status(201)
     res.send("Succes Updated")
 })
@@ -122,7 +102,7 @@ app.post('/login', (req, res) => {
             });
             
         })
-        res.send("Data not found")
+        res.send("Login Failed")
     }
     else {
         recordRealm.write(() => {

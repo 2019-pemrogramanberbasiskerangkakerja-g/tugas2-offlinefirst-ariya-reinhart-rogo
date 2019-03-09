@@ -20,6 +20,6 @@ Masing - masing project sudah dilengkapi dengan `nodemon` sehingga tidak perlu m
 ## To Do list
 1. Register di remote (done)
 2. Push data user ke DB Local (done)
-3. Buat DB log di local dan remote
-4. Rekam log di DB local 
+3. Buat DB log di local dan remote (done)
+4. Rekam log di DB local (done)
 5. Push data log dari local ke remote

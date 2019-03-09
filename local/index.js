@@ -117,6 +117,27 @@ app.post('/login', (req, res) => {
     }
 })
 
+setInterval(() => {
+    let log = recordRealm.objects('Log')
+
+    console.log("Syncing to Remote DB")
+
+    agent.post('localhost:3003/sync')
+        .send(log)
+        .then(
+            (response) => {
+                if (response.status == 201) {
+                    console.log("Remote DB synced")
+                }
+            }
+        )
+        .catch(
+            err => {
+                console.log(err)
+            }
+        )
+}, 5000)
+
 app.listen(3000, () => {
     console.log("Start")
 })

@@ -54,23 +54,24 @@ app.get('/', (req, res) => {
     let log = recordRealm.objects('Log')
 
     res.status(200)
-    res.send(users)
-    res.send(log)
+    res.send({users: users, log: log})
+
 })
 
 app.post('/sync', (req, res) => {
-    blogRealm.write(() => {
-        let users = blogRealm.objects('User')
-        blogRealm.deleteAll()
+    recordRealm.write(() => {
+        let log = recordRealm.objects('Log')
+        recordRealm.deleteAll()
     })
 
-    let users = req.body
+    let log = req.body
 
-    blogRealm.write(() => {
-        for (let i in users) {
-            blogRealm.create('User', {
-                username: users[i].username,
-                password: users[i].password,
+    recordRealm.write(() => {
+        for (let i in log) {
+            recordRealm.create('Log', {
+                username: log[i].username,
+                login: log[i].login,
+                time: log[i].time,
             })
         }
     })
@@ -116,7 +117,7 @@ setInterval(() => {
                 console.log(err)
             }
         )
-}, 3000)
+}, 5000)
 
 app.listen(3003, () => {
     console.log("Start")

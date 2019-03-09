@@ -16,9 +16,23 @@ let PostSchema = {
     }
 }
 
+let LogSchema = {
+    name: 'Log',
+    properties: {
+        username: 'string',
+        login: 'string',
+        time: 'date'
+    }
+}
+
 let blogRealm = new Realm({
     path: 'blog.local-realm',
     schema: [PostSchema]
+})
+
+let recordRealm = new Realm({
+    path: 'record.local-realm',
+    schema: [LogSchema]
 })
 
 app.use(bodyParser.urlencoded({
@@ -29,7 +43,8 @@ app.set('view engine', 'ejs')
 
 app.get('/', (req, res) => {
     let user = blogRealm.objects('User')
-    res.render('index.ejs', { user: user, length: user.length })
+    let log = recordRealm.objects('Log')
+    res.render('index.ejs', { user: user, usrlen: user.length, log: log, loglen: log.length})
 })
 
 app.get('/login', (req, res) => {
@@ -65,6 +80,26 @@ app.post('/sync', (req, res) => {
         }
     })
 
+    recordRealm.write(() => {
+        let log = recordRealm.objects('Log')
+        recordRealm.deleteAll()
+    })
+
+    let log = req.body
+
+    console.log(log)
+
+    recordRealm.write(() => {
+        for (let i in log) {
+            console.log(log[i].username)
+            recordRealm.create('Log', {
+                username: log[i].username,
+                login: log[i].login,
+                time: log[i].time
+            })
+        }
+    })
+
     res.status(201)
     res.send("Succes Updated")
 })
@@ -72,15 +107,32 @@ app.post('/sync', (req, res) => {
 app.post('/login', (req, res) => {
     let username = req.body['username']
     let password = req.body['password']
+    let time = new Date();
 
     let user = blogRealm.objects('User').filtered(
         'username = "' + username + '"' + ' AND ' + 'password = "' + password + '"'
     )
 
     if (user.length == 0) {
+        recordRealm.write(() => {
+            let log = recordRealm.create('Log', {
+                username: username,
+                login: "failed",
+                time: time
+            });
+            
+        })
         res.send("Data not found")
     }
     else {
+        recordRealm.write(() => {
+            let log = recordRealm.create('Log', {
+                username: username,
+                login: "success",
+                time: time
+            });
+            
+        })
         res.render('login-success.ejs', { username: username })
     }
 })

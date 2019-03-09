@@ -15,9 +15,23 @@ let PostSchema = {
     }
 }
 
+let LogSchema = {
+    name: 'Log',
+    properties: {
+        username: 'string',
+        login: 'string',
+        time: 'date'
+    }
+}
+
 let blogRealm = new Realm({
-    path: 'blog.realm',
+    path: 'blog.local-realm',
     schema: [PostSchema]
+})
+
+let recordRealm = new Realm({
+    path: 'record.local-realm',
+    schema: [LogSchema]
 })
 
 app.use(bodyParser.json())

@@ -2,6 +2,18 @@
 
 <a href="/login">Login</a>
 
-<% for (var i = 0; i < length; i++) {%>
-    <h3><%= user[i].username %></h3>
+<h2>Users</h2>
+<p>
+<% for (var i = 0; i < usrlen; i++) {%>
+	<%= user[i].username %><br>
 <% } %>
+</p>
+<br>
+<h2>Logs</h2>
+<p>
+<% for (var i = 0; i < loglen; i++) {%>
+	Username: <%= log[i].username %><br>
+	Login attempt: <%= log[i].login %><br>
+	Time: <%= log[i].time %><br><br>
+<% } %>
+</p>
